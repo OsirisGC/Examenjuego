@@ -10,119 +10,349 @@
 			width: 100%;
 		}
 		canvas{
-			background-color: rgb(0, 0, 0);
+			background-color: rgb(255, 0, 0);
 			margin: auto; 
 		} 
 	</style>
 </head>
-<body>
-	<canvas id="mycanvas" width="500" height="500">
+
+<body >
+	<canvas id="mycanvas" width="1000" height="1010">
 		Tu navegador no soporta canvas
 	</canvas>
+
 	<script type="text/javascript">
-		
 		var cv = null;
 		var ctx = null;
 		var player1 = null;
 		var meta = null;
-		var pared = null;
+		var pared = [];
 		var direction = 'right';
-		var speed = 10;
+		var speed = 3;
 		var flameante = new Image();
 		var cthulhu = new Image();
 		var muro = new Image();
+        var fondo = new Image();
 		var sonidogame = new Audio();
+		var	musicwin = new Audio();
 		var pause = false;
+		var cronometro;
+		var min = 0;
+        var seg = 0;
+		var coords = [
+            [0, 0, 10, 1000],
+            [1000, 0, 10, 1000],
+            [0, 0, 1000, 10],
+            [0, 1000, 1000, 10],
+            [10, 100, 50, 10],
+            [50, 50, 50, 10],
+            [50, 10, 10, 50],
+            [150, 50, 250, 10],
+            [500, 50, 100, 10],
+            [750, 50, 50, 10],
+            [850, 50, 100, 10],
+            [200, 100, 50, 10],
+            [400, 100, 50, 10],
+            [500, 100, 50, 10],
+            [700, 100, 50, 10],
+            [800, 100, 100, 10],
+            [150, 150, 50, 10],
+            [250, 150, 150, 10],
+            [550, 150, 50, 10],
+            [900, 150, 50, 10],
+            [100, 200, 50, 10],
+            [200, 200, 50, 10],
+            [300, 200, 200, 10],
+            [550, 200, 100, 10],
+            [700, 200, 150, 10],
+            [950, 200, 50, 10],
+            [350, 250, 50, 10],
+            [450, 250, 50, 10],
+            [600, 250, 100, 10],
+            [750, 250, 150, 10],
+            [250, 300, 100, 10],
+            [400, 300, 50, 10],
+            [550, 300, 50, 10],
+            [650, 300, 100, 10],
+            [800, 300, 100, 10],
+            [200, 350, 100, 10],
+            [350, 350, 100, 10],
+            [500, 350, 50, 10],            
+            [600, 350, 100, 10],            
+            [750, 350, 50, 10],
+            [900, 350, 50, 10],
+            [150, 400, 50, 10],
+            [250, 400, 100, 10],
+            [700, 400, 50, 10],
+            [200, 450, 50, 10],
+            [350, 450, 150, 10],
+            [550, 450, 250, 10],
+            [500, 500, 300, 10],
+            [850, 500, 50, 10],
+            [550, 550, 200, 10],
+            [800, 550, 50, 10],
+            [900, 550, 50, 10],
+            [350, 550, 50, 10],
+            [150, 600, 100, 10],
+            [300, 600, 150, 10],
+            [600, 600, 300, 10],
+            [950, 600, 50, 10],
+            [100, 650, 50, 10],
+            [200, 650, 150, 10],
+            [400, 650, 100, 10],
+            [550, 650, 200, 10],
+            [150, 700, 50, 10],
+            [300, 700, 150, 10],
+            [700, 700, 100, 10],
+            [850, 700, 100, 10],
+            [200, 750, 100, 10],
+            [450, 750, 300, 10],
+            [800, 750, 150, 10],
+            [150, 800, 200, 10],
+            [400, 800, 250, 10],
+            [950, 800, 50, 10],
+            [100, 850, 200, 10],
+            [350, 850, 100, 10],
+            [500, 850, 50, 10],
+            [600, 850, 50, 10],
+            [700, 850, 100, 10],
+            [900, 850, 50, 10],
+            [150, 900, 50, 10],
+            [300, 900, 150, 10],
+            [550, 900, 50, 10],
+            [750, 900, 100, 10],
+            [950, 900, 50, 10],
+            [50, 950, 100, 10],
+            [250, 950, 50, 10],
+            [450, 950, 50, 10],
+            [600, 950, 200, 10],
+            [850, 950, 100, 10],
+            [100, 50, 10, 100],
+            [50, 250, 150, 10],
+            [10, 300, 150, 10],
+            [50, 150, 10, 100],
+            [50, 150, 60, 10],
+            [200, 250, 10, 200],
+            [150, 300, 10, 50],
+            [50, 350, 110, 10],
+            [50, 400, 10, 100],
+            [150, 400, 50, 10],
+            [100, 350, 10, 100],            
+            [100, 450, 50, 10],
+            [150, 500, 200, 10],       
+            [150, 450, 10, 60],
+            [10, 500, 100, 10],
+            [100, 650, 10, 150],
+            [60, 600, 50, 10],
+            [100, 550, 200, 10],
+            [50, 550, 10, 400],
+            [100, 550, 10, 50],
+            [100, 850, 10, 100],
+            [150, 50, 10, 200],
+            [150, 600, 10, 50],
+            [150, 700, 10, 100],
+            [200, 900, 10, 100],
+            [250, 100, 10, 200],
+            [250, 600, 10, 50],
+            [250, 700, 10, 50],
+            [250, 850, 10, 100],
+            [300, 50, 10, 50],
+            [300, 200, 10, 50],
+            [300, 400, 10, 100],
+            [300, 550, 10, 50],
+            [300, 700, 10, 50],
+            [300, 900, 10, 50],
+            [350, 100, 10, 50],
+            [350, 300, 10, 100],
+            [350, 500, 10, 50],
+            [350, 650, 10, 50],
+            [350, 750, 10, 100],
+            [350, 950, 10, 50],
+            [400, 50, 10, 50],
+            [400, 250, 10, 50],
+            [400, 400, 10, 50],
+            [400, 500, 10, 50],
+            [400, 600, 10, 50],
+            [400, 700, 10, 100],
+            [400, 900, 10, 50],
+            [450, 50, 10, 100],
+            [450, 300, 10, 100],
+            [450, 450, 10, 150],
+            [450, 850, 10, 50],
+            [450, 950, 10, 50],
+            [500, 50, 10, 300],
+            [500, 400, 10, 50],
+            [500, 500, 10, 250],
+            [500, 850, 10, 100],
+            [550, 200, 10, 100],
+            [550, 350, 10, 100],
+            [550, 550, 10, 150],
+            [550, 900, 10, 100],
+            [600, 50, 10, 100],
+            [600, 250, 10, 150],
+            [600, 700, 10, 50],
+            [600, 850, 10, 50],
+            [650, 10, 10, 200],
+            [650, 400, 10, 50],
+            [650, 650, 10, 50],
+            [650, 800, 10, 50],
+            [650, 900, 10, 50],
+            [700, 10, 10, 50],
+            [700, 100, 10, 50],
+            [700, 200, 10, 50],
+            [700, 350, 10, 50],
+            [700, 700, 10, 50],
+            [700, 800, 10, 150],
+            [750, 50, 10, 50],
+            [750, 150, 10, 50],
+            [750, 250, 10, 100],
+            [750, 550, 10, 50],
+            [750, 750, 10, 50],
+            [800, 50, 10, 100],
+            [800, 350, 10, 200],
+            [800, 650, 10, 200],
+            [850, 100, 10, 100],
+            [850, 300, 10, 150],
+            [850, 600, 10, 100],
+            [850, 800, 10, 150],
+            [900, 150, 10, 150],
+            [900, 350, 10, 300],
+            [900, 750, 10, 150],
+            [950, 50, 10, 100],
+            [950, 200, 10, 150],
+            [950, 400, 10, 150],
+            [950, 650, 10, 50],
+            [950, 900, 10, 50],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+            [1000, 1000, 1000, 1000],
+        ];
+
 		function start()
 		{
 			cv = document.getElementById('mycanvas');
 			ctx = cv.getContext('2d');
-			player1 = new Cuadrado(20,20,40,40,'red');
-			meta = new Cuadrado(generateRandomInteger(500),generateRandomInteger(500),40,40,'yellow');
-			pared = new Cuadrado(40,80,30,300,'gray');
+			//cordenadas de los objetos reales
+			player1 = new Cuadrado(10,10,35,35,'red');
+			meta = new Cuadrado(960,955,40,40,'yellow');
 			flameante.src = 'PR.png';
 			cthulhu.src = 'Final.png';
 			muro.src = 'Muronormal.jpeg';
+            fondo.src = 'fondo.jpg';
 			sonidogame.src = 'musicgame.mp3';
+			musicwin.src = 'musicwin.mp3';
+			sonidogame.play();
+			
+			for (var i = 0; i < 200; i++) {
+                var n = new Cuadrado(coords[i][0], coords[i][1], coords[i][2], coords[i][3], "white");
+                pared.push(n);
+            }
+
 			paint();
 		} 
-		function paint()
-		{
+		function paint(){
 			window.requestAnimationFrame(paint)
 			ctx.fillStyle = "black";
-			ctx.fillRect(0,0,500,500);
-			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,1200,1200);
 			player1.c = "black";
-			
+
+			for (var i = 0; i < 200; i++) {
+                pared[i].dibujar(ctx);
+                ctx.drawImage(muro, pared[i].x, pared[i].y, pared[i].w, pared[i].h);
+            }
+
 			//player1.dibujar(ctx);
-			ctx.drawImage(flameante,player1.x,player1.y,40,40);
+			ctx.drawImage(flameante,player1.x,player1.y, 40,40)
 			//meta.dibujar(ctx);
-			ctx.drawImage(cthulhu,meta.x,meta.y, 60,60);
+			ctx.drawImage(cthulhu,meta.x,meta.y, 40,40)
 			//pared.dibujar(ctx);
-			ctx.drawImage(muro,pared.x,pared.y,30,300);
+			ctx.drawImage(muro,pared.x,pared.y,30,300)
+			
 			if (pause) {
-				
-				ctx.fillStyle = "rgba(0,0,0,0.5)";
-				ctx.fillRect(0,0,500,500);
+				sonidogame.pause();
+				ctx.fillStyle = "rgba(0,0,0,0.5)"
+				ctx.fillRect(0,0,1000,1000)
 				ctx.fillStyle = "white";
-				ctx.fillText('PAUSA',230,230);
+				ctx.fillText('PAUSE',250,250 );
 			}else{
+				sonidogame.play();
 				update();
 			}
-			
 		}
-		function update()
-		{
-			
+
+		function update(){
 			if (direction == 'right') {
 				player1.x += speed;
-				if (player1.x>500) {
+				if (player1.x>1000) {
 					player1.x = 0;
 				}
 			}
 			if (direction == 'left') {
 				player1.x -= speed;
 				if (player1.x<0) {
-					player1.x = 500;
+					player1.x = 1000;
 				}
 			}
-			
 			if (direction == 'down') {
 				player1.y += speed;
-				if (player1.y>500) {
+				if (player1.y>1000) {
 					player1.y = 0;
 				}
 			}
 			if (direction == 'up') {
 				player1.y -= speed;
 				if (player1.y<0) {
-					player1.y = 500;
+					player1.y = 1000;
 				}
 			}
-			if (player1.se_tocan(meta)) {
-				meta.x = generateRandomInteger(500);
-				meta.y = generateRandomInteger(500);
-				speed += 5;
-				sonidogame.play();
+
+			if (player1.se_tocan(meta) ) {
+                clearInterval(cronometro);
+                speed = 0;
+                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.fillRect(0, 0, 1000, 1000);
+                ctx.fillStyle = "WHITE";
+                ctx.font = "100px arial";
+                ctx.fillText("YOU  WIN", 250, 250);
+                ctx.font = "100px arial";
+                ctx.fillText("YOUR TIME WAS = " + min + " min " + seg + "segs", 300, 450);
+                ctx.fillText("Press R to restart", 1000, 1000);
+                sonidogame.pause();
+                musicwin.play();
 			}
-			
-			if (player1.se_tocan(pared)) {
-				if (direction == 'right') {
-					player1.x -= speed; 
+
+			pared.forEach(function(item, index, arr) {
+				if (item.se_tocan(player1)) {
+					if (direction == 'right') {
+						player1.x -= speed; 
+					}
+					if (direction == 'left') {
+						player1.x += speed; 
+					}
+					if (direction == 'down') {
+						player1.y -= speed; 
+					}
+					if (direction == 'up') {
+						player1.y += speed; 
+					}
 				}
-				if (direction == 'left') {
-					player1.x += speed; 
-				}
-				
-				if (direction == 'down') {
-					player1.y -= speed; 
-				}
-				if (direction == 'up') {
-					player1.y += speed; 
-				}
-			}
-			
+			});
 		}
+
 		document.addEventListener('keydown',function(e){
 			//arriba
 			if (e.which == 87 || e.which == 38) {
@@ -144,7 +374,12 @@
 			if (e.which == 32  ) { 
 				pause = (pause)?false:true;
 			}
+			//RESTART
+            if (e.keyCode == 114 || e.keyCode == 82) {
+                location.reload();
+            }
 		})
+
 		window.addEventListener('load',start)
 		window.requestAnimationFrame = (function () {
 		    return window.requestAnimationFrame ||
@@ -154,6 +389,7 @@
 		            window.setTimeout(callback, 17);
 		        };
 		}());
+
 		function Cuadrado(x,y,w,h,c)
 		{
 			this.x = x;
@@ -176,13 +412,31 @@
 				ctx.strokeRect(this.x,this.y,this.w,this.h);
 			}
 		}
+
+        document.addEventListener('click', function(e) {
+            console.log(e.offsetX + "," + e.offsetY);
+            player1.x = e.offsetX;
+            player1.y = e.offsetY;
+        });
+
+		function relog() {
+            cronometro = setInterval(function() {
+                if (seg == 60) {
+                    seg = 0;
+                    min += 1;
+                    if (min == 60) {
+                        min = 0;
+                    }
+                }
+                seg++;
+            }, 1000);
+        }
+
 		function random_rgba() {
 		    var o = Math.round, r = Math.random, s = 255;
 		    return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
 		}
-		function generateRandomInteger(max) {
-		    return Math.floor(Math.random() * max) + 1;
-		}
+
 	</script>
 </body>
 </html>
